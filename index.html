@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kazushi & Hinako Wedding Invitation</title>
     
-    <!-- ファビコン設定 (ICO形式を維持) -->
+    <!-- ファビコン -->
     <link rel="icon" href="./Photos/kh.ico" type="image/x-icon">
     
     <!-- Tailwind CSS -->
@@ -42,26 +42,14 @@
                             light: '#e5d5b5',
                             dark: '#9d7b39',
                         },
-                        sage: {
-                            50: '#f6f9f7',
-                            100: '#ecf3ee',
-                            300: '#bcead5',
-                            500: '#84a98c',
-                        },
                     },
                     animation: {
-                        'scroll-left-mobile': 'scrollLeft 15s linear infinite',
-                        'scroll-left-desktop': 'scrollLeft 30s linear infinite',
                         'float-slow': 'float 8s ease-in-out infinite',
                         'float-slower': 'float 10s ease-in-out 1s infinite',
                         'doodle-sway': 'sway 5s ease-in-out infinite',
                         'pixel-walk': 'pixelWalk 0.4s steps(2) infinite',
                     },
                     keyframes: {
-                        scrollLeft: {
-                            '0%': { transform: 'translateX(0)' },
-                            '100%': { transform: 'translateX(-50%)' },
-                        },
                         float: {
                             '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
                             '50%': { transform: 'translateY(-15px) rotate(1deg)' },
@@ -85,6 +73,7 @@
         body {
             background-color: #fffdf5;
             color: #78350f;
+            -webkit-tap-highlight-color: transparent;
         }
 
         #loader {
@@ -105,18 +94,13 @@
             transition: left 3s linear, right 3s linear, opacity 0.2s ease;
         }
         @media (min-width: 768px) {
-            .walker {
-                width: 270px;
-                height: 270px;
-            }
+            .walker { width: 270px; height: 270px; }
         }
 
         .walker-left-start { left: -300px; }
         .walker-right-start { right: -300px; }
-        
         .walker-left-end { left: calc(50% - 75px); }
         .walker-right-end { right: calc(50% - 75px); }
-        
         @media (min-width: 768px) {
             .walker-left-end { left: calc(50% - 135px); }
             .walker-right-end { right: calc(50% - 135px); }
@@ -162,9 +146,6 @@
             border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
             transition: border-radius 5s ease-in-out;
         }
-        .blob-shape:hover {
-            border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
-        }
 
         .hero-sticky {
             position: sticky;
@@ -179,7 +160,6 @@
             position: relative;
             z-index: 10;
             background-color: transparent;
-            margin-top: 0; 
         }
 
         .rsvp-curved-top {
@@ -209,40 +189,24 @@
             transform: translateY(0);
         }
 
-        .delay-200 { transition-delay: 200ms; }
-        .delay-400 { transition-delay: 400ms; }
-        
-        #image-modal {
-            transition: opacity 0.3s ease-in-out, visibility 0.3s;
+        /* --- Swipable Gallery Styling --- */
+        .gallery-scroll-container {
+            overflow-x: auto;
+            display: flex;
+            gap: 1.5rem; /* gap-6 */
+            padding-bottom: 2rem;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+            cursor: grab;
+            -webkit-overflow-scrolling: touch; /* スーっと動く慣性スクロールを有効化 */
         }
-        #image-modal.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
+        .gallery-scroll-container::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
         }
-        #image-modal:not(.hidden) {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: auto;
-        }
-        
-        .doodle-icon {
-            position: absolute;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.6;
-            color: #fbbf24;
+        .gallery-scroll-container:active {
+            cursor: grabbing;
         }
 
-        .gallery-img-container {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            flex-shrink: 0;
-        }
-        .gallery-img-container:hover {
-            transform: scale(1.05);
-            box-shadow: 0 35px 50px -10px rgba(0, 0, 0, 0.25);
-            z-index: 10;
-        }
         .gallery-img {
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
             width: 240px; 
@@ -250,22 +214,26 @@
             object-fit: cover;
             object-position: center;
             max-width: none;
+            user-select: none;
+            pointer-events: none; /* 画像への直接のドラッグを無効化 */
+        }
+        .gallery-img-container {
+            pointer-events: auto; /* コンテナでのクリック（モーダル）は有効 */
         }
         @media (min-width: 768px) {
-            .gallery-img {
-                width: 320px;
-                height: 320px;
-            }
+            .gallery-img { width: 320px; height: 320px; }
+            .gallery-scroll-container { gap: 3rem; }
         }
 
-        /* --- Map Grayscale Style --- */
+        #image-modal {
+            transition: opacity 0.3s ease-in-out, visibility 0.3s;
+        }
+        
         .grayscale-map {
             filter: grayscale(1) contrast(1.1) brightness(1);
             transition: filter 0.5s ease;
         }
-        .grayscale-map:hover {
-            filter: grayscale(0) contrast(1) brightness(1);
-        }
+        .grayscale-map:hover { filter: grayscale(0) contrast(1); }
     </style>
 </head>
 <body class="font-serif antialiased selection:bg-mimosa-300 selection:text-mimosa-900 overflow-x-hidden">
@@ -273,36 +241,24 @@
     <!-- Loading Screen -->
     <div id="loader" class="fixed inset-0 bg-mimosa-50 z-[100] flex flex-col items-center justify-center overflow-hidden">
         <div class="relative w-full max-w-2xl h-screen">
-            <!-- 新婦：左から登場 -->
             <div id="bride-walker" class="walker walker-left-start z-10">
                 <div class="w-full h-full animate-pixel-walk">
                     <img src="./Photos/bride-wakler.png" class="w-40 h-40 md:w-72 md:h-72 rounded-full border-4 md:border-8 border-mimosa-300 shadow-xl object-cover" alt="Bride Walking">
                 </div>
             </div>
-            <!-- 新郎：右から登場 -->
             <div id="groom-walker" class="walker walker-right-start z-10">
                 <div class="w-full h-full animate-pixel-walk" style="animation-delay: 0.2s;">
                     <img src="./Photos/groom-wakler.png" class="w-40 h-40 md:w-72 md:h-72 rounded-full border-4 md:border-8 border-mimosa-400 shadow-xl object-cover" alt="Groom Walking">
                 </div>
             </div>
             <div id="meeting-heart" class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-full mb-8 opacity-0 transition-opacity duration-300 text-gold">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 animate-bounce" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 animate-bounce" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" /></svg>
             </div>
         </div>
-
-        <!-- Final Photo with Elegant Ornament Frame -->
         <div id="loader-final-photo" class="absolute top-1/2 left-1/2 z-20 elegant-frame w-[360px] md:w-[648px]">
-            <div class="corner-border corner-tl"></div>
-            <div class="corner-border corner-tr"></div>
-            <div class="corner-border corner-bl"></div>
-            <div class="corner-border corner-br"></div>
-            
+            <div class="corner-border corner-tl"></div><div class="corner-border corner-tr"></div><div class="corner-border corner-bl"></div><div class="corner-border corner-br"></div>
             <div class="elegant-inner-line">
-                <div class="bg-white p-2 md:p-4 shadow-inner border border-gray-200">
-                    <img src="./Photos/final-photo.png" class="w-full h-auto object-cover" alt="Together">
-                </div>
+                <div class="bg-white p-2 md:p-4 shadow-inner border border-gray-200"><img src="./Photos/final-photo.png" class="w-full h-auto object-cover" alt="Together"></div>
                 <div class="mt-8 text-center">
                     <p class="font-serif text-[10px] md:text-xs tracking-[0.4em] uppercase text-gold mb-2 font-bold">Welcome to our special day</p>
                     <p class="font-script text-4xl md:text-6xl text-gray-800 drop-shadow-sm">Kazushi & Hinako</p>
@@ -314,11 +270,8 @@
     <!-- Hero Section -->
     <div class="hero-sticky flex items-center justify-center">
         <div class="absolute inset-0">
-            <img src="./Photos/hero-section.png" 
-                 alt="Wedding Hero" 
-                 class="w-full h-full object-cover opacity-90">
-            <div class="absolute inset-0 bg-yellow-900/10 mix-blend-overlay"></div>
-            <div class="absolute inset-0 bg-white/10"></div>
+            <img src="./Photos/hero-section.png" alt="Wedding Hero" class="w-full h-full object-cover opacity-90">
+            <div class="absolute inset-0 bg-yellow-900/10 mix-blend-overlay"></div><div class="absolute inset-0 bg-white/10"></div>
         </div>
         <div class="relative z-10 text-center text-white drop-shadow-2xl px-6">
             <p class="tracking-[0.5em] text-xs md:text-sm uppercase mb-4 opacity-100 font-bold">Wedding Invitation</p>
@@ -327,125 +280,73 @@
         </div>
         <div class="absolute bottom-10 left-0 right-0 flex flex-col items-center justify-center text-white drop-shadow-lg animate-bounce">
             <span class="text-xs tracking-[0.3em] uppercase mb-2 mr-[-0.3em] font-bold">Scroll</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7" /></svg>
         </div>
     </div>
 
     <!-- Main Content Layer -->
     <div id="main-content" class="content-layer relative w-full rounded-t-[3rem] shadow-[0_-30px_70px_-10px_rgba(0,0,0,0.25)] overflow-hidden">
         
-        <svg class="doodle-icon top-10 left-[-20px] md:left-[12.5%] w-32 h-32 animate-doodle-sway text-mimosa-400/40" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M50 20 Q60 5 70 20 T90 20 Q95 30 85 40 T80 60 Q70 70 50 60 Q30 70 20 60 T15 40 Q5 30 10 20 T30 20 Q40 5 50 20 Z" />
-            <path d="M50 60 Q50 80 40 90 M50 60 Q50 80 60 90" />
-        </svg>
-
         <!-- Greeting Section -->
         <section class="min-h-[90vh] flex flex-col items-center justify-center px-6 py-32 js-scroll-trigger relative">
             <div class="stagger-item max-w-lg mx-auto text-center relative z-10">
                 <div class="w-16 h-16 mx-auto mb-12 text-sage-500">
-                    <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full animate-float-slow drop-shadow-md">
-                        <path d="M12.0002 21.0002C12.0002 21.0002 6.55021 17.0502 6.55021 11.2002C6.55021 7.6402 9.07021 5.3802 12.0002 3.0002C14.9302 5.3802 17.4502 7.6402 17.4502 11.2002C17.4502 17.0502 12.0002 21.0002 12.0002 21.0002Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                        <path d="M12 21V11" stroke="currentColor" stroke-width="1.5"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full animate-float-slow drop-shadow-md"><path d="M12.0002 21.0002C12.0002 21.0002 6.55021 17.0502 6.55021 11.2002C6.55021 7.6402 9.07021 5.3802 12.0002 3.0002C14.9302 5.3802 17.4502 7.6402 17.4502 11.2002C17.4502 17.0502 12.0002 21.0002 12.0002 21.0002Z" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M12 21V11" stroke="currentColor" stroke-width="1.5"/></svg>
                 </div>
-                <h2 class="font-serif text-2xl md:text-4xl text-mimosa-900 mb-16 leading-relaxed font-bold">
-                    陽射しが日ごとに<br class="md:hidden">
-                    眩しさを増すこの頃
-                </h2>
-                <div class="space-y-12 leading-loose md:leading-[2.5] text-sm md:text-xl text-gray-800 font-sans tracking-wide font-medium">
-                    <p>
-                        夏の気配が色濃くなる季節<br class="md:hidden">
-                        皆様におかれましては<br class="md:hidden">
-                        ますますご清祥のことと<br class="md:hidden">
-                        お慶び申し上げます
-                    </p>
-                    <p>
-                        このたび 私たちは<br class="md:hidden">
-                        結婚式を挙げることとなりました<br class="md:hidden">
-                        日頃より温かく見守ってくださる<br class="md:hidden">
-                        皆様に 感謝の気持ちを<br class="md:hidden">
-                        お伝えする場にしたいと<br class="md:hidden">
-                        考えております
-                    </p>
-                    <p>
-                        美味しいお食事と<br class="md:hidden">
-                        楽しいひとときをご用意して<br class="md:hidden">
-                        皆様にお会いできることを<br class="md:hidden">
-                        心待ちにしております
-                    </p>
+                <h2 class="font-serif text-2xl md:text-4xl text-mimosa-900 mb-16 leading-relaxed font-bold">陽射しが日ごとに<br class="md:hidden">眩しさを増すこの頃</h2>
+                <div class="space-y-12 leading-loose md:leading-[2.5] text-sm md:text-xl text-gray-800 font-sans tracking-wide font-medium text-center">
+                    <p>夏の気配が色濃くなる季節<br class="md:hidden">皆様におかれましては<br class="md:hidden">ますますご清祥のことと<br class="md:hidden">お慶び申し上げます</p>
+                    <p>このたび 私たちは<br class="md:hidden">結婚式を挙げることとなりました<br class="md:hidden">日頃より温かく見守ってくださる<br class="md:hidden">皆様に 感謝の気持ちを<br class="md:hidden">お伝えする場にしたいと<br class="md:hidden">考えております</p>
+                    <p>美味しいお食事と<br class="md:hidden">楽しいひとときをご用意して<br class="md:hidden">皆様にお会いできることを<br class="md:hidden">心待ちにしております</p>
                 </div>
             </div>
         </section>
 
-        <!-- Gallery Section -->
+        <!-- Gallery Section: スワイプ対応慣性スクロール版 -->
         <section class="py-24 bg-white overflow-hidden border-t-2 border-b-2 border-mimosa-300 js-scroll-trigger relative shadow-inner">
             <div class="stagger-item">
                 <p class="text-center text-xs tracking-[0.4em] text-mimosa-900 uppercase mb-12 font-bold">Memories Gallery</p>
-                <div class="relative w-full overflow-hidden">
-                    <div class="flex gap-6 px-3 md:gap-12 md:px-6 w-max animate-scroll-left-mobile md:animate-scroll-left-desktop hover:[animation-play-state:paused] py-8">
-                        <!-- Set 1 (Original) -->
-                        <div class="cursor-pointer group relative gallery-img-container" onclick="openModal(this)" data-message="鶴見緑地公園；初めて二人が出会った場所">
-                            <img src="./Photos/memory1.png" class="gallery-img rounded-xl" alt="Memory 1">
-                        </div>
-                        <div class="cursor-pointer group relative gallery-img-container" onclick="openModal(this)" data-message="天橋立；初めて二人で行った旅行先">
-                            <img src="./Photos/memory2.png" class="gallery-img rounded-xl" alt="Memory 2">
-                        </div>
-                        <div class="cursor-pointer group relative gallery-img-container" onclick="openModal(this)" data-message="手作りの指輪；初めて二人で作った指輪">
-                            <img src="./Photos/memory3.png" class="gallery-img rounded-xl" alt="Memory 3">
-                        </div>
-                        <div class="cursor-pointer group relative gallery-img-container" onclick="openModal(this)" data-message="1DK；初めての二人が同棲した家">
-                            <img src="./Photos/memory4.png" class="gallery-img rounded-xl" alt="Memory 4">
-                        </div>
-                        <!-- Set 2 (Clone) -->
-                        <div class="cursor-pointer group relative gallery-img-container" onclick="openModal(this)" data-message="鶴見緑地公園；初めて二人が出会った場所">
-                            <img src="./Photos/memory1.png" class="gallery-img rounded-xl" alt="Memory 1">
-                        </div>
-                        <div class="cursor-pointer group relative gallery-img-container" onclick="openModal(this)" data-message="天橋立；初めて二人で行った旅行先">
-                            <img src="./Photos/memory2.png" class="gallery-img rounded-xl" alt="Memory 2">
-                        </div>
-                        <div class="cursor-pointer group relative gallery-img-container" onclick="openModal(this)" data-message="手作りの指輪；初めて二人で作った指輪">
-                            <img src="./Photos/memory3.png" class="gallery-img rounded-xl" alt="Memory 3">
-                        </div>
-                        <div class="cursor-pointer group relative gallery-img-container" onclick="openModal(this)" data-message="1DK；初めての二人が同棲した家">
-                            <img src="./Photos/memory4.png" class="gallery-img rounded-xl" alt="Memory 4">
-                        </div>
+                <div class="relative w-full">
+                    <div id="gallery-scroller" class="gallery-scroll-container px-6">
+                        <!-- 画像セット1 -->
+                        <div class="gallery-img-container" onclick="openModal(this)" data-message="鶴見緑地公園；初めて二人が出会った場所"><img src="./Photos/memory1.png" class="gallery-img rounded-xl" alt="M1"></div>
+                        <div class="gallery-img-container" onclick="openModal(this)" data-message="天橋立；初めて二人で行った旅行先"><img src="./Photos/memory2.png" class="gallery-img rounded-xl" alt="M2"></div>
+                        <div class="gallery-img-container" onclick="openModal(this)" data-message="手作りの指輪；初めて二人で作った指輪"><img src="./Photos/memory3.png" class="gallery-img rounded-xl" alt="M3"></div>
+                        <div class="gallery-img-container" onclick="openModal(this)" data-message="1DK；初めての二人が同棲した家"><img src="./Photos/memory4.png" class="gallery-img rounded-xl" alt="M4"></div>
+                        <!-- ループ用クローン -->
+                        <div class="gallery-img-container" onclick="openModal(this)" data-message="鶴見緑地公園；初めて二人が出会った場所"><img src="./Photos/memory1.png" class="gallery-img rounded-xl" alt="M1"></div>
+                        <div class="gallery-img-container" onclick="openModal(this)" data-message="天橋立；初めて二人で行った旅行先"><img src="./Photos/memory2.png" class="gallery-img rounded-xl" alt="M2"></div>
+                        <div class="gallery-img-container" onclick="openModal(this)" data-message="手作りの指輪；初めて二人で作った指輪"><img src="./Photos/memory3.png" class="gallery-img rounded-xl" alt="M3"></div>
+                        <div class="gallery-img-container" onclick="openModal(this)" data-message="1DK；初めての二人が同棲した家"><img src="./Photos/memory4.png" class="gallery-img rounded-xl" alt="M4"></div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Profile Section: 改行位置と行間の修正 -->
+        <!-- Profile Section -->
         <section class="py-32 px-6 bg-mimosa-50 relative border-b border-mimosa-200">
-            <div class="max-w-4xl mx-auto">
-                <div class="text-center mb-24 js-scroll-trigger">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="mb-24 js-scroll-trigger">
                     <h2 class="font-script text-6xl text-mimosa-900 mb-4 stagger-item drop-shadow-sm">Profile</h2>
                     <p class="text-xs text-mimosa-600 tracking-[0.3em] uppercase stagger-item delay-200 font-bold">Who we are</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-24">
-                    <div class="flex flex-col items-center js-scroll-trigger text-center">
-                        <div class="relative w-64 h-64 mb-10 stagger-item animate-float-slow">
-                            <img src="./Photos/groom.png" alt="Kazushi" class="w-full h-full object-cover blob-shape shadow-2xl border-6 border-white ring-1 ring-mimosa-200">
-                        </div>
+                    <div class="flex flex-col items-center js-scroll-trigger">
+                        <div class="relative w-64 h-64 mb-10 stagger-item animate-float-slow"><img src="./Photos/groom.png" alt="Kazushi" class="w-full h-full object-cover blob-shape shadow-2xl border-6 border-white ring-1 ring-mimosa-200"></div>
                         <div class="stagger-item delay-200">
                             <h3 class="text-2xl font-bold mb-2 text-mimosa-900">木下 和志</h3>
                             <p class="text-sm text-mimosa-500 font-script text-3xl mb-6">Kazushi Kinoshita</p>
-                            <!-- 改行位置を指定に合わせ、行間を調整 -->
                             <p class="text-sm leading-relaxed md:leading-loose text-gray-700 font-medium px-4">
                                 1998.07.27生まれ。<br>
                                 当日は皆様と<br class="md:hidden">たくさん笑って過ごせることを<br>楽しみにしています！
                             </p>
                         </div>
                     </div>
-                    <div class="flex flex-col items-center js-scroll-trigger text-center">
-                        <div class="relative w-64 h-64 mb-10 stagger-item animate-float-slower">
-                            <img src="./Photos/bride.png" alt="Hinako" class="w-full h-full object-cover blob-shape shadow-2xl border-6 border-white ring-1 ring-mimosa-200">
-                        </div>
+                    <div class="flex flex-col items-center js-scroll-trigger">
+                        <div class="relative w-64 h-64 mb-10 stagger-item animate-float-slower"><img src="./Photos/bride.png" alt="Hinako" class="w-full h-full object-cover blob-shape shadow-2xl border-6 border-white ring-1 ring-mimosa-200"></div>
                         <div class="stagger-item delay-200">
                             <h3 class="text-xl font-bold mb-2 text-mimosa-900">玉田 日奈子</h3>
                             <p class="text-sm text-mimosa-500 font-script text-3xl mb-6">Hinako Tamada</p>
-                            <!-- 改行位置を指定に合わせ、行間を調整 -->
                             <p class="text-sm leading-relaxed md:leading-loose text-gray-700 font-medium px-4">
                                 1999.02.03生まれ。<br>
                                 久しぶりにお会いできる方も多いので<br class="md:hidden">とてもワクワクしています！
@@ -457,81 +358,61 @@
         </section>
 
         <!-- Details Section -->
-        <section class="py-32 px-6 bg-white relative overflow-hidden">
-            <div class="max-w-xl mx-auto js-scroll-trigger">
-                <div class="text-center mb-24">
-                    <h2 class="font-script text-6xl text-mimosa-900 mb-4 stagger-item drop-shadow-sm">The Day</h2>
-                    <p class="text-xs text-mimosa-600 tracking-[0.3em] uppercase stagger-item delay-200 font-bold">Invitation details</p>
-                </div>
-                <div class="space-y-24 text-center stagger-item delay-200">
-                    <div class="bg-mimosa-50 p-12 rounded-3xl border-2 border-mimosa-400 relative group shadow-xl transition-all duration-500 hover:shadow-2xl">
-                        <span class="absolute top-4 left-1/2 transform -translate-x-1/2 text-mimosa-300 text-7xl font-script opacity-30 group-hover:opacity-50 transition-opacity">Date</span>
-                        <h3 class="text-xs font-black text-mimosa-900 tracking-[0.5em] mb-6 uppercase relative z-10">When</h3>
+        <section class="py-32 px-6 bg-white relative">
+            <div class="max-w-xl mx-auto text-center js-scroll-trigger">
+                <div class="mb-24"><h2 class="font-script text-6xl text-mimosa-900 mb-4 drop-shadow-sm">The Day</h2><p class="text-xs text-mimosa-600 tracking-[0.3em] font-bold uppercase">Invitation details</p></div>
+                <div class="space-y-24 stagger-item">
+                    <div class="bg-mimosa-50 p-12 rounded-3xl border-2 border-mimosa-400 shadow-xl">
+                        <span class="absolute top-4 left-1/2 transform -translate-x-1/2 text-mimosa-300 text-7xl font-script opacity-30">Date</span>
+                        <h3 class="text-xs font-black text-mimosa-900 tracking-[0.5em] mb-6 relative z-10">When</h3>
                         <p class="text-4xl font-serif text-gray-900 relative z-10 font-bold">2026.07.11</p>
-                        <p class="text-sm text-mimosa-600 mt-3 uppercase tracking-widest relative z-10 font-bold">Saturday</p>
+                        <p class="text-sm text-mimosa-600 mt-3 relative z-10 font-bold">Saturday</p>
                     </div>
-                    <div class="bg-mimosa-50 p-12 rounded-3xl border-2 border-mimosa-400 relative group shadow-xl transition-all duration-500 hover:shadow-2xl overflow-hidden">
-                        <span class="absolute top-4 left-1/2 transform -translate-x-1/2 text-mimosa-300 text-7xl font-script opacity-30 group-hover:opacity-50 transition-opacity">Place</span>
-                        <h3 class="text-xs font-black text-mimosa-900 tracking-[0.5em] mb-6 uppercase relative z-10">Where</h3>
+                    <div class="bg-mimosa-50 p-12 rounded-3xl border-2 border-mimosa-400 shadow-xl">
+                        <span class="absolute top-4 left-1/2 transform -translate-x-1/2 text-mimosa-300 text-7xl font-script opacity-30">Place</span>
+                        <h3 class="text-xs font-black text-mimosa-900 tracking-[0.5em] mb-6 relative z-10">Where</h3>
                         <p class="text-2xl font-bold text-gray-900 mb-3 relative z-10">アーセンティア迎賓館 大阪</p>
-                        <p class="text-sm text-gray-600 mb-2 font-sans relative z-10 font-medium">大阪府大阪市西区江戸堀1-5-13</p>
-                        <p class="text-xs text-mimosa-600 mb-6 font-sans relative z-10 font-bold">地下鉄四つ橋線「肥後橋駅」8番出口より徒歩1分</p>
-                        <p class="text-sm text-gray-700 mb-8 font-sans relative z-10 font-bold">Tel: 06-6225-9862</p>
-                        
-                        <div class="relative z-10 mb-10 rounded-2xl overflow-hidden shadow-lg border border-mimosa-300 bg-gray-100">
-                            <iframe 
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3280.6032483819865!2d135.4947937765103!3d34.68995168043642!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6000e6f2ec559779%3A0xc009695d733487c5!2z44Ki44O844K744Oz44OG44Kj44Ki6L-O6L6-6aSoIOWkp-mYqg!5e0!3m2!1sja!2sjp!4v1708064973418!5m2!1sja!2sjp" 
-                                width="100%" height="250" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-                                class="grayscale-map">
-                            </iframe>
+                        <p class="text-sm text-gray-600 mb-2 font-medium">大阪府大阪市西区江戸堀1-5-13</p>
+                        <p class="text-sm text-gray-700 mb-8 font-bold font-sans">Tel: 06-6225-9862</p>
+                        <div class="mb-10 rounded-2xl overflow-hidden shadow-lg border border-mimosa-300">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3280.6032483819865!2d135.4947937765103!3d34.68995168043642!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6000e6f2ec559779%3A0xc009695d733487c5!2z44Ki44O844K744Oz44OG44Kj44Ki6L-O6L6-6aSoIOWkp-mYqg!5e0!3m2!1sja!2sjp!4v1708064973418!5m2!1sja!2sjp" width="100%" height="250" style="border:0;" allowfullscreen="" loading="lazy" class="grayscale-map"></iframe>
                         </div>
-
-                        <a href="https://www.google.com/maps/search/?api=1&query=アーセンティア迎賓館大阪" target="_blank" 
-                           class="relative z-10 inline-block px-10 py-4 bg-mimosa-900 text-mimosa-50 text-xs tracking-widest hover:bg-mimosa-700 transition-all duration-300 rounded-full shadow-lg font-bold">
-                           Google MAPで開く
-                        </a>
+                        <a href="https://www.google.com/maps/search/?api=1&query=アーセンティア迎賓館大阪" target="_blank" class="relative z-10 inline-block px-10 py-4 bg-mimosa-900 text-mimosa-50 text-xs tracking-widest hover:bg-mimosa-700 transition-all duration-300 rounded-full shadow-lg font-bold">Google MAPで開く</a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- RSVP Section: 指定の改行位置と空白(スペース)の反映 -->
+        <!-- RSVP Section: 改行と空白、行間の修正反映 -->
         <section class="min-h-[80vh] flex flex-col items-center justify-center px-6 bg-mimosa-200 text-mimosa-900 text-center js-scroll-trigger rsvp-curved-top pb-32">
             <div class="stagger-item max-w-lg w-full relative z-30">
-                <h2 class="font-script text-7xl mb-4 text-mimosa-900 drop-shadow-sm">Attendance</h2>
-                <p class="text-sm text-mimosa-700 mb-16 tracking-[0.4em] font-serif font-bold uppercase">ご出欠の確認</p>
-                <!-- 指定の改行位置、空白、行間を反映 -->
+                <h2 class="font-script text-7xl mb-4 drop-shadow-sm">Attendance</h2>
+                <p class="text-sm text-mimosa-700 mb-16 font-bold uppercase">ご出欠の確認</p>
                 <p class="text-mimosa-900 text-base mb-16 leading-relaxed md:leading-loose tracking-wide font-sans font-bold px-4">
-                    お手数ではございますが<span class="hidden md:inline">&nbsp;</span><br class="md:hidden">挙式へのご出欠を<br>
-                    下記のボタンより<span class="hidden md:inline">&nbsp;</span><br class="md:hidden">お知らせくださいますよう<br>
+                    お手数ではございますが<span class="hidden md:inline">&nbsp;</span>挙式へのご出欠を<br>
+                    下記のボタンより<span class="hidden md:inline">&nbsp;</span>お知らせくださいますよう<br>
                     お願い申し上げます
                 </p>
                 <div class="px-4">
                     <a href="https://forms.gle/o1Uqu9GTfQw4Rxja7" target="_blank" class="group block w-full py-6 bg-mimosa-900 text-mimosa-50 text-base font-bold tracking-[0.3em] relative overflow-hidden transition-all hover:-translate-y-1.5 duration-300 shadow-2xl rounded-xl">
                         <span class="relative z-10">ご出欠を回答する</span>
-                        <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </a>
                 </div>
-                <p class="mt-24 text-xs text-mimosa-700 tracking-[0.2em] font-bold">回答期限：未定</p>
+                <p class="mt-24 text-xs text-mimosa-700 font-bold">回答期限：未定</p>
             </div>
         </section>
 
         <footer class="bg-mimosa-900 text-mimosa-100 py-16 text-center text-[10px] tracking-[0.4em] relative z-30 font-bold">
-            <p class="mb-2">Produced by Kazushi & Hinako</p>
-            <p>&copy; 2026 Wedding Invitation</p>
+            <p class="mb-2">Produced by Kazushi & Hinako</p><p>&copy; 2026 Wedding Invitation</p>
         </footer>
     </div>
 
-    <!-- Modal for Gallery -->
+    <!-- Modal -->
     <div id="image-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-6" onclick="closeModal()">
-        <div class="relative max-w-2xl w-full bg-white p-2 rounded-2xl shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] transform transition-transform duration-300 scale-100" onclick="event.stopPropagation()">
-            <button onclick="closeModal()" class="absolute -top-14 right-0 text-white hover:text-mimosa-400 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
+        <div class="relative max-w-2xl w-full bg-white p-2 rounded-2xl shadow-2xl" onclick="event.stopPropagation()">
+            <button onclick="closeModal()" class="absolute -top-14 right-0 text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
             <div class="bg-mimosa-50 rounded-xl overflow-hidden border border-gray-100">
-                <img id="modal-image" src="" alt="Memory Detail" class="w-full h-auto max-h-[60vh] object-contain mx-auto shadow-sm">
+                <img id="modal-image" src="" alt="Detail" class="w-full h-auto max-h-[60vh] object-contain mx-auto shadow-sm">
                 <div class="p-10 text-center">
                     <p id="modal-message" class="text-mimosa-900 font-sans font-bold leading-relaxed text-base md:text-lg"></p>
                     <p class="text-xs text-mimosa-400 mt-6 tracking-[0.5em] uppercase font-black">Memory</p>
@@ -543,75 +424,69 @@
     <!-- Scripts -->
     <script>
         function openModal(element) {
-            const img = element.querySelector('img');
-            const message = element.getAttribute('data-message');
-            const modal = document.getElementById('image-modal');
-            const modalImg = document.getElementById('modal-image');
-            const modalMsg = document.getElementById('modal-message');
-            modalImg.src = img.src;
-            modalMsg.textContent = message || "素敵な思い出の一枚です。";
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
+            const img = element.querySelector('img'); const message = element.getAttribute('data-message');
+            const modal = document.getElementById('image-modal'); const modalImg = document.getElementById('modal-image'); const modalMsg = document.getElementById('modal-message');
+            modalImg.src = img.src; modalMsg.textContent = message; modal.classList.remove('hidden'); document.body.style.overflow = 'hidden';
         }
-        function closeModal() {
-            const modal = document.getElementById('image-modal');
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-        }
+        function closeModal() { document.getElementById('image-modal').classList.add('hidden'); document.body.style.overflow = ''; }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const groomWalker = document.getElementById('groom-walker');
-            const brideWalker = document.getElementById('bride-walker');
-            const finalPhoto = document.getElementById('loader-final-photo');
-            const heart = document.getElementById('meeting-heart');
+            const scroller = document.getElementById('gallery-scroller');
             const loader = document.getElementById('loader');
             const mainContent = document.getElementById('main-content');
-            
-            setTimeout(() => {
-                brideWalker.classList.remove('walker-left-start');
-                brideWalker.classList.add('walker-left-end');
-                groomWalker.classList.remove('walker-right-start');
-                groomWalker.classList.add('walker-right-end');
-            }, 100);
-            
-            setTimeout(() => {
-                groomWalker.style.display = 'none';
-                brideWalker.style.display = 'none';
-                heart.style.opacity = '1';
-                setTimeout(() => finalPhoto.classList.add('show'), 200);
-            }, 3000);
-            
-            setTimeout(() => loader.classList.add('loader-hidden'), 6500);
-            
-            const observer = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target);
+
+            // --- Hybrid Auto-Scroll with Swipe functionality ---
+            let isUserInteracting = false;
+            let autoScrollSpeed = window.innerWidth < 768 ? 0.8 : 1.2; // スマホは少しゆっくり
+
+            function step() {
+                if (!isUserInteracting) {
+                    scroller.scrollLeft += autoScrollSpeed;
+                    // ループ処理（コンテンツの半分まで来たらリセット）
+                    if (scroller.scrollLeft >= (scroller.scrollWidth - scroller.clientWidth) / 2 + scroller.clientWidth / 2) {
+                        scroller.scrollLeft = 0;
                     }
-                });
+                }
+                requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+
+            // スワイプ・タッチ開始時に自動スクロールを一時停止
+            scroller.addEventListener('touchstart', () => { isUserInteracting = true; }, { passive: true });
+            scroller.addEventListener('mousedown', () => { isUserInteracting = true; });
+            
+            // 離してから少し遅れて自動スクロール再開
+            const resumeAuto = () => { setTimeout(() => { isUserInteracting = false; }, 2000); };
+            scroller.addEventListener('touchend', resumeAuto, { passive: true });
+            scroller.addEventListener('mouseup', resumeAuto);
+            scroller.addEventListener('mouseleave', resumeAuto);
+
+            // --- Other UI Logic ---
+            setTimeout(() => { 
+                document.getElementById('bride-walker').classList.add('walker-left-end'); 
+                document.getElementById('groom-walker').classList.add('walker-right-end'); 
+            }, 100);
+
+            setTimeout(() => {
+                document.getElementById('groom-walker').style.display = 'none';
+                document.getElementById('bride-walker').style.display = 'none';
+                document.getElementById('meeting-heart').style.opacity = '1';
+                setTimeout(() => document.getElementById('loader-final-photo').classList.add('show'), 200);
+            }, 3000);
+
+            setTimeout(() => loader.classList.add('loader-hidden'), 6500);
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('is-visible'); } });
             }, { threshold: 0.1 });
             document.querySelectorAll('.js-scroll-trigger').forEach(trigger => observer.observe(trigger));
 
-            let ticking = false;
-            const handleScrollBackground = () => {
-                if (!ticking) {
-                    window.requestAnimationFrame(() => {
-                        const rect = mainContent.getBoundingClientRect();
-                        const isMobile = window.innerWidth < 768;
-                        const triggerPoint = isMobile ? window.innerHeight * -0.1 : window.innerHeight * 0.2; 
-                        const startPoint = window.innerHeight; 
-                        let alpha = (startPoint - rect.top) / (startPoint - triggerPoint);
-                        alpha = Math.max(0, Math.min(1, alpha)); 
-                        mainContent.style.backgroundColor = `rgba(255, 253, 245, ${alpha})`;
-                        ticking = false;
-                    });
-                    ticking = true;
-                }
-            };
-
-            window.addEventListener('scroll', handleScrollBackground, { passive: true });
-            handleScrollBackground(); 
+            window.addEventListener('scroll', () => {
+                const rect = mainContent.getBoundingClientRect();
+                const triggerPoint = window.innerHeight * (window.innerWidth < 768 ? -0.1 : 0.2); 
+                let alpha = (window.innerHeight - rect.top) / (window.innerHeight - triggerPoint);
+                mainContent.style.backgroundColor = `rgba(255, 253, 245, ${Math.max(0, Math.min(1, alpha))})`;
+            }, { passive: true });
         });
     </script>
 </body>
